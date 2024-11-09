@@ -237,3 +237,50 @@ function getSubstringBetweenBrackets(string, startIndex, openBracket, closeBrack
     }
     return substring;
 }
+(function() {
+    // Define the format of your Twine story ('twine' or 'harlowe-3')
+    const format = 'harlowe-3'; // Adjust based on your story format
+
+    // Generate the JSON data
+    const jsonData = twineToJSON(format);
+
+    // Convert the JSON data to a string with proper formatting
+    const jsonString = JSON.stringify(jsonData, null, 2); // Pretty-print with 2-space indentation
+
+    // Create a Blob from the JSON string
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Create a button to trigger the download
+    const button = document.createElement('button');
+    button.innerText = 'Download Story as JSON';
+    button.style.position = 'fixed';
+    button.style.top = '10px';
+    button.style.right = '10px';
+    button.style.zIndex = 1000; // Ensure the button appears above other elements
+    document.body.appendChild(button);
+
+    // Add an event listener to handle the click event
+    button.addEventListener('click', () => {
+        // Create a link element
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+
+        // Set the download attribute with a filename
+        const filename = (jsonData.name || 'story') + '.json';
+        link.download = filename;
+
+        // Append the link to the document
+        document.body.appendChild(link);
+
+        // Programmatically trigger a click on the link to start the download
+        link.click();
+
+        // Clean up and remove the link
+        document.body.removeChild(link);
+
+        // Optionally, revoke the object URL after a short delay
+        setTimeout(() => {
+            URL.revokeObjectURL(link.href);
+        }, 100);
+    });
+})();
